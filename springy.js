@@ -94,6 +94,17 @@
 		}
 	};
 
+	Graph.prototype.addGenericNodes = function() {
+		// accepts variable number of arguments, where each argument
+		// is an {label: "name", attr1: , }
+		for (var i = 0; i < arguments.length; i++) {
+			var attr = arguments[i];
+			var name = attr.label;
+			var node = new Node(name, attr);
+			this.addNode(node);
+		}
+	};
+
 	Graph.prototype.addEdge = function(edge) {
 		var exists = false;
 		this.edges.forEach(function(e) {
@@ -191,6 +202,36 @@
 		}
 	}
 
+	// add custom nodes and edges from JSON object
+	Graph.prototype.loadGenericJSON = function(json) {
+	/**
+	Springy's simple JSON format for graphs.
+
+	historically, Springy uses separate lists
+	of nodes and edges
+{
+  "nodes": [
+    {label: "Amp", meaning: "test1", font: '22px Verdana'},
+    {label: "Cat", meaning: "test2"},
+    {label: "Cat2", meaning: "test2"},
+  ],
+  "edges": [
+    ["Amp", "Cat", {color: '#00A0B0', directional: true}],
+    ["Cat2", "Cat", {color: '#003333', directional: false}]
+  ]
+}
+
+	**/
+		// parse if a string is passed (EC5+ browsers)
+		if (typeof json == 'string' || json instanceof String) {
+			json = JSON.parse( json );
+		}
+
+		if ('nodes' in json || 'edges' in json) {
+			this.addGenericNodes.apply(this, json['nodes']);
+			this.addEdges.apply(this, json['edges']);
+		}
+	}
 
 	// find the edges from node1 to node2
 	Graph.prototype.getEdges = function(node1, node2) {

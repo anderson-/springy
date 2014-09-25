@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {label: "我", meaning: "I", font: '22px Verdana'},
+    {label: "我的", meaning: "My"},
+    {label: "我们", meaning: "Our"},
+  ],
+  "edges": [
+    ["我", "我们", {color: '#00A0B0', directional: true}],
+    ["我", "我的", {color: '#003333', directional: true}]
+  ]
+}

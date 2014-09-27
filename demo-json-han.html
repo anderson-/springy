@@ -8,7 +8,8 @@
 <p id="pinyin">Pinyin</p>
 
 <script>
-$.getJSON("data-han.json", function(json) {
+//$.getJSON("data-han.json", function(json) {
+$.getJSON("/Users/fernandoizquierdo/dev/webdev/han/data.json", function(json) {
 	jQuery(function(){
 	  var graph = new Springy.Graph();
 	  graph.loadGenericJSON(json);
@@ -25,7 +26,7 @@ $.getJSON("data-han.json", function(json) {
 });
 </script>
 
-<canvas id="springydemo" width="640" height="480" />
+<canvas id="springydemo" width="940" height="780" />
 
 </body>
 </html>

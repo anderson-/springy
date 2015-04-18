@@ -1,5 +1,5 @@
 /**
- * Springy v2.6.1
+ * Springy v2.7.1
  *
  * Copyright (c) 2010-2013 Dennis Hotson
  *
@@ -24,22 +24,24 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(function () {
+            return (root.returnExportsGlobal = factory());
+        });
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like enviroments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals
+        root.Springy = factory();
+    }
+}(this, function() {
 
-(function() {
-	// Enable strict mode for EC5 compatible browsers
-	"use strict";
-
-	// Establish the root object, `window` in the browser, or `global` on the server.
-	var root = this;
-
-	// The top-level namespace. All public Springy classes and modules will
-	// be attached to this. Exported for both CommonJS and the browser.
-	var Springy;
-	if (typeof exports !== 'undefined') {
-		Springy = exports;
-	} else {
-		Springy = root.Springy = {};
-	}
+	var Springy = {};
 
 	var Graph = Springy.Graph = function() {
 		this.nodeSet = {};
@@ -93,8 +95,8 @@
 			this.addNode(node);
 		}
 	};
-
-	Graph.prototype.addGenericNodes = function() {
+	
+		Graph.prototype.addGenericNodes = function() {
 		// accepts variable number of arguments, where each argument
 		// is an {label: "name", attr1: , }
 		for (var i = 0; i < arguments.length; i++) {
@@ -166,6 +168,36 @@
 		return edge;
 	};
 
+	// add custom nodes and edges from JSON object
+	Graph.prototype.loadGenericJSON = function(json) {
+	/**
+	Springy's simple JSON format for graphs.
+
+	historically, Springy uses separate lists
+	of nodes and edges
+{
+  "nodes": [
+    {label: "Amp", meaning: "test1", font: '22px Verdana'},
+    {label: "Cat", meaning: "test2"},
+    {label: "Cat2", meaning: "test2"},
+  ],
+  "edges": [
+    ["Amp", "Cat", {color: '#00A0B0', directional: true}],
+    ["Cat2", "Cat", {color: '#003333', directional: false}]
+  ]
+}
+
+	**/
+		// parse if a string is passed (EC5+ browsers)
+		if (typeof json == 'string' || json instanceof String) {
+			json = JSON.parse( json );
+		}
+
+		if ('nodes' in json || 'edges' in json) {
+			this.addGenericNodes.apply(this, json['nodes']);
+			this.addEdges.apply(this, json['edges']);
+		}
+	}
 
 	// add nodes and edges from JSON object
 	Graph.prototype.loadJSON = function(json) {
@@ -202,36 +234,6 @@
 		}
 	}
 
-	// add custom nodes and edges from JSON object
-	Graph.prototype.loadGenericJSON = function(json) {
-	/**
-	Springy's simple JSON format for graphs.
-
-	historically, Springy uses separate lists
-	of nodes and edges
-{
-  "nodes": [
-    {label: "Amp", meaning: "test1", font: '22px Verdana'},
-    {label: "Cat", meaning: "test2"},
-    {label: "Cat2", meaning: "test2"},
-  ],
-  "edges": [
-    ["Amp", "Cat", {color: '#00A0B0', directional: true}],
-    ["Cat2", "Cat", {color: '#003333', directional: false}]
-  ]
-}
-
-	**/
-		// parse if a string is passed (EC5+ browsers)
-		if (typeof json == 'string' || json instanceof String) {
-			json = JSON.parse( json );
-		}
-
-		if ('nodes' in json || 'edges' in json) {
-			this.addGenericNodes.apply(this, json['nodes']);
-			this.addEdges.apply(this, json['edges']);
-		}
-	}
 
 	// find the edges from node1 to node2
 	Graph.prototype.getEdges = function(node1, node2) {
@@ -371,7 +373,7 @@
 		this.stiffness = stiffness; // spring stiffness constant
 		this.repulsion = repulsion; // repulsion constant
 		this.damping = damping; // velocity damping factor
-		this.minEnergyThreshold = minEnergyThreshold || 0.01; //threshold used to determine render stop 
+		this.minEnergyThreshold = minEnergyThreshold || 0.01; //threshold used to determine render stop
 
 		this.nodePoints = {}; // keep track of points associated with nodes
 		this.edgeSprings = {}; // keep track of springs associated with edges
@@ -515,14 +517,14 @@
 
 	var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }; // stolen from coffeescript, thanks jashkenas! ;-)
 
-	Springy.requestAnimationFrame = __bind(root.requestAnimationFrame ||
-		root.webkitRequestAnimationFrame ||
-		root.mozRequestAnimationFrame ||
-		root.oRequestAnimationFrame ||
-		root.msRequestAnimationFrame ||
+	Springy.requestAnimationFrame = __bind(this.requestAnimationFrame ||
+		this.webkitRequestAnimationFrame ||
+		this.mozRequestAnimationFrame ||
+		this.oRequestAnimationFrame ||
+		this.msRequestAnimationFrame ||
 		(function(callback, element) {
-			root.setTimeout(callback, 10);
-		}), root);
+			this.setTimeout(callback, 10);
+		}), this);
 
 
 	/**
@@ -761,4 +763,6 @@
 		}
 		return true;
 	};
-}).call(this);
+
+  return Springy;
+}));

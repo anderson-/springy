@@ -1,0 +1,38 @@
+<html>
+<body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="springy.js"></script>
+<script src="springyui.js"></script>
+
+
+<script>
+var graphJSON = {
+  "nodes": [
+    {label: "Amp", meaning: "test1", font: '22px Verdana'},
+    {label: "Cat", meaning: "test2", color: 'red'},
+    {label: "Cat2", meaning: "test2"},
+  ],
+  "edges": [
+    ["Amp", "Cat", {color: '#00A0B0', directional: true}],
+    ["Cat2", "Cat", {color: '#003333', directional: false}]
+  ]
+};
+
+jQuery(function(){
+  var graph = new Springy.Graph();
+  graph.loadGenericJSON(graphJSON);
+
+  var springy = jQuery('#springydemo').springy({
+    graph: graph,
+    nodeSelected: function(node){
+      console.log('Node selected: ' + JSON.stringify(node.data));
+    }
+  });
+});
+</script>
+
+<canvas id="springydemo" width="640" height="480" />
+
+
+</body>
+</html>
